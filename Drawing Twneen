@@ -79,7 +79,7 @@ local Workspace = game:GetService("Workspace")
 local func = {}
 --
 -- // Functions
-function func.TweenDrawing(Render, RenderInfo, RenderTo)
+function func:TweenDrawing(Render, RenderInfo, RenderTo)
     local Start = {}
     local CurrentTime = 0
     --
