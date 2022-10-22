@@ -76,9 +76,10 @@ local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local GuiService = game:GetService("GuiService")
 local Workspace = game:GetService("Workspace")
+local func = {}
 --
 -- // Functions
-function TweenDrawing(Render, RenderInfo, RenderTo)
+function func.TweenDrawing(Render, RenderInfo, RenderTo)
     local Start = {}
     local CurrentTime = 0
     --
@@ -109,3 +110,5 @@ function TweenDrawing(Render, RenderInfo, RenderTo)
         end
     end)
 end
+
+return func
