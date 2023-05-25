@@ -1,1 +1,566 @@
 
+local UserInput = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
+local mouse = game.Players.LocalPlayer:GetMouse()
+local Utilitys = loadstring(game:HttpGet("https://raw.githubusercontent.com/VainSolutions-Kiitty/Functions/main/Utility.lua"))()
+local TweenDrawingT = loadstring(game:HttpGet("https://raw.githubusercontent.com/VainSolutions-Kiitty/VainSolutions/main/Drawing%20Twneen"))()
+local AnchoreNumber = 0
+local bordernumber = 0
+local Draggable = true
+local Created = {}
+local library = {
+    AccentColor = Color3.fromRGB(25,255,0),
+    Functions = {},
+    Flags = {},
+    Ui = {
+      Tabs = {},
+      Rendered = {},
+      Connected = {},
+      OtherRendered = {},
+    }
+}
+
+local Ui = library.Ui
+function NewMouse()
+ Ui.Rendered["MOUSEUI"] = Drawing.new("Square")
+ local MOUSESQUARE = Ui.Rendered["MOUSEUI"]
+MOUSESQUARE.Size = Vector2.new(5 , 5)
+MOUSESQUARE.Filled = true
+MOUSESQUARE.Color = Color3.new(1,1,1)
+MOUSESQUARE.ZIndex = 9999
+ Ui.Connected["MOUSEUICONNECTION"] = game:GetService("RunService").RenderStepped:Connect(function()
+    MOUSESQUARE.Position = Vector2.new(mouse.X, mouse.Y + 40)
+ end)   
+end
+
+function Unload()
+    for i,v in pairs(Ui.Connected) do if v then v:Disconnect() end end
+    for i,v in pairs(Ui.Rendered) do if v then v:Remove() end end
+    for i,v in pairs(Ui.OtherRendered) do if v then v:Remove() end end
+end
+
+Ui.Connected["A<A_UNINJKECT"] = UserInput.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.P then
+        Unload()
+    end 
+end)
+
+local function DrawUiObject(Type , Properties)
+    local drawing = Drawing.new(Type)
+    for i,v in next, Properties do
+       drawing[i] = v
+    end
+    table.insert(Ui.Rendered, drawing)
+    return drawing
+ end
+
+local function MouseOver(obj)
+    local mousePos = UserInput:GetMouseLocation()
+    local x1 = obj.Position.X
+    local y1 = obj.Position.Y
+    local x2 = x1 + obj.Size.X
+    local y2 = y1 + obj.Size.Y
+    return (mousePos.X >= x1 and mousePos.Y >= y1 and mousePos.X <= x2 and mousePos.Y <= y2)
+ end
+local function DrawingFade(Obj, Transp, time)
+    TweenDrawingT:TweenDrawing(Obj,TweenInfo.new(time, Enum.EasingStyle.Quad, Enum.EasingDirection.In),{Transparency = Transp})
+ end
+
+function CreateUiAnchor(Item, xS, xO, yS, yO, Relitive, test)
+    AnchoreNumber = AnchoreNumber + 1
+    Ui.Connected["connection" .. AnchoreNumber] = game:GetService("RunService").RenderStepped:Connect(function()
+        Item.Position = Utilitys.RobloxPosition(xS, xO, yS, yO, Relitive)
+        if test then
+            Item.Visible = Relitive.Visible
+        end
+        if Item == nil or Relitive == nil then
+            return error("Object Not Found")
+        end
+    end)
+    return AnchoreNumber
+ end
+function dragify(Frame)
+
+    dragToggle = nil
+    dragInput = nil
+    dragStart = nil
+    local dragPos = nil
+    function updateInput(input)
+        local Delta = input.Position - dragStart
+        local Position = Utilitys.RobloxPosition(0, startPos.X + Delta.X, 0, startPos.Y + Delta.Y)
+        Frame.Position = Position
+    end
+    Ui.Connected["A<A_DRAGGING"] = UserInput.InputBegan:Connect(
+        function(input)
+            if
+                (input.UserInputType == Enum.UserInputType.MouseButton1 or
+                    input.UserInputType == Enum.UserInputType.Touch) and
+                    MouseOver(Frame) and
+                    Draggable
+             then
+                dragToggle = true
+                dragStart = input.Position
+                startPos = Frame.Position
+                --library.Dragging = true
+                input.Changed:Connect(
+                    function()
+                        if input.UserInputState == Enum.UserInputState.End then
+                            dragToggle = false
+                        end
+                    end
+                )
+            else
+                --library.Dragging = false
+            end
+        end
+    )
+    Ui.Connected["A<A_DRAGGING2"] =UserInput.InputChanged:Connect(
+        function(input)
+            if
+                input.UserInputType == Enum.UserInputType.MouseMovement or
+                    input.UserInputType == Enum.UserInputType.Touch
+             then
+                dragInput = input
+            end
+        end
+    )
+    Ui.Connected["A<A_DRAGGING2"] =game:GetService("UserInputService").InputChanged:Connect(
+        function(input)
+            if input == dragInput and dragToggle then
+                updateInput(input)
+            end
+        end
+    )
+ end
+function CreateLegacyBorder(MainFrame, ColorA , inlined)
+    local Border1 = DrawUiObject("Square" , { Filled = true,Thickness = 0, Color = ColorA , Size = Utilitys.RobloxSize(0, 614, 0, 382) , Position = Vector2.new(0,0)})
+	local Border2 = DrawUiObject("Square" , { Filled = true,Thickness = 0, Color = ColorA , Size = Utilitys.RobloxSize(0, 614, 0, 382) , Position = Vector2.new(0,0)})
+	local Border3 = DrawUiObject("Square" , { Filled = true,Thickness = 0, Color = ColorA , Size = Utilitys.RobloxSize(0, 614, 0, 382) , Position = Vector2.new(0,0)})
+	local Border4 = DrawUiObject("Square" , { Filled = true,Thickness = 0, Color = ColorA , Size = Utilitys.RobloxSize(0, 614, 0, 382) , Position = Vector2.new(0,0)})
+
+    CreateUiAnchor(Border1 ,0,0,0,0 , MainFrame)
+    CreateUiAnchor(Border2 ,0,0,0,0 , MainFrame)
+    CreateUiAnchor(Border3 ,1,0,0,0 , MainFrame)
+    CreateUiAnchor(Border4 ,0,0,1,0 , MainFrame)
+
+    Ui.Connected["A<A" .. bordernumber] = game:GetService("RunService").RenderStepped:Connect(function() 
+        Border1.Visible = MainFrame.Visible
+        Border1.Size = Utilitys.RobloxSize(0, 1, 0, MainFrame.Size.Y , MainFrame)
+        Border2.Visible = MainFrame.Visible
+        Border2.Size = Utilitys.RobloxSize(0, MainFrame.Size.X, 0, 1 , MainFrame)
+        Border3.Visible = MainFrame.Visible
+        Border3.Size = Utilitys.RobloxSize(0, (inlined or 1), 0, MainFrame.Size.Y , MainFrame)
+        Border4.Visible = MainFrame.Visible
+        Border4.Size = Utilitys.RobloxSize(0, MainFrame.Size.X, 0, 1 , MainFrame)
+    end)
+
+    bordernumber = bordernumber + 1
+    return Border
+ end
+ function TabBorder(MainFrame, ColorA , inlined)
+    local Border1 = DrawUiObject("Square" , { Filled = true,Thickness = 0, Color = ColorA , Size = Utilitys.RobloxSize(0, 614, 0, 382) , Position = Vector2.new(0,0)})
+	local Border2 = DrawUiObject("Square" , { Filled = true,Thickness = 0, Color = ColorA , Size = Utilitys.RobloxSize(0, 614, 0, 382) , Position = Vector2.new(0,0)})
+
+	local Border4 = DrawUiObject("Square" , { Filled = true,Thickness = 0, Color = ColorA , Size = Utilitys.RobloxSize(0, 614, 0, 382) , Position = Vector2.new(0,0)})
+
+    CreateUiAnchor(Border1 ,0,0,0.2,0 , MainFrame)
+    CreateUiAnchor(Border2 ,0,0,0,0 , MainFrame)
+
+    CreateUiAnchor(Border4 ,0,0,1,0 , MainFrame)
+
+    Ui.Connected["A<A_BORDER" .. bordernumber] = game:GetService("RunService").RenderStepped:Connect(function() 
+        Border1.Visible = MainFrame.Visible
+        Border1.Size = Utilitys.RobloxSize(0, 1, 0, MainFrame.Size.Y - 3, MainFrame)
+        Border2.Visible = MainFrame.Visible
+        Border2.Size = Utilitys.RobloxSize(0, MainFrame.Size.X, 0, 1 , MainFrame)
+        Border4.Visible = MainFrame.Visible
+        Border4.Size = Utilitys.RobloxSize(0, MainFrame.Size.X, 0, 1 , MainFrame)
+    end)
+
+    bordernumber = bordernumber + 1
+    return Border
+ end
+function CreateBorder(MainFrame, ColorA , inlined)
+
+    
+    
+    local Border = DrawUiObject("Square" , { Filled = false,Thickness = 0, Color = ColorA , Size = Utilitys.RobloxSize(0, 614, 0, 382) , Position = Vector2.new(0,0)})
+    if inlined then
+        CreateUiAnchor(Border ,0,-1,0,0 , MainFrame)
+    else
+        CreateUiAnchor(Border ,0,-1,0,-1 , MainFrame)
+    end
+    Ui.Connected["A<A" .. bordernumber] = game:GetService("RunService").RenderStepped:Connect(function() 
+        Border.Visible = MainFrame.Visible
+        Border.Size = Vector2.new(math.floor(MainFrame.Size.X + 1), math.floor(MainFrame.Size.Y + 1))
+    end)
+    bordernumber = bordernumber + 1
+    return Border
+ end
+
+
+function CloseAllWindows(ignorename)
+        for i, SV in pairs(Ui.Tabs) do
+            
+            table.foreach(SV,function(idx, Val)
+                if Val  then
+                    if SV == ignorename then return end
+                    DrawingFade(Val , 0 , 0.15)
+                    
+                    Val.Visible = false   
+                end
+            end)
+        end
+ end
+local GuiOpen = true
+ ----------------
+function library:Start()
+    local UiMainWindow = DrawUiObject("Square" , { Visible = true ,Filled = true,Thickness = 0, Color = Color3.new(0.0901961, 0.0901961, 0.0901961) , Size = Utilitys.RobloxSize(0, 614, 0, 472)})
+    local AccentBar = DrawUiObject("Square" , { Visible = true ,Filled = true,Thickness = 0, Color = library.AccentColor , Size = Utilitys.RobloxSize(0, 614, 0, 1) })
+    local TabBar = DrawUiObject("Square" , { Visible = true ,Filled = true,Thickness = 0, Color = Color3.new(0.12549, 0.121569, 0.129412) , Size = Utilitys.RobloxSize(0, 614, 0, 18) })
+    
+    local TabbarProperties = {Index = 0 , MaxX = 0.84}
+
+    CreateUiAnchor(AccentBar ,0,0,0,0,UiMainWindow) -- makes the elements follow the valid relative
+    CreateUiAnchor(TabBar ,0,0,0.005,0,UiMainWindow)-- makes the elements follow the valid relative
+    CreateBorder(UiMainWindow,Color3.new(0,0,0)) -- self explantitoy
+    CreateLegacyBorder(TabBar,Color3.new(0,0,0) , 0.5) -- self explantitoy
+
+    dragify(UiMainWindow) -- Makes the drawing draggable :3
+    NewMouse()
+    
+    UserInput.InputBegan:Connect(function(input)
+        if input.KeyCode == Enum.KeyCode.Home then
+            if GuiOpen == true then
+            GuiOpen = false
+            for i,v in pairs(Ui.Rendered) do
+                pcall(function()
+                    CloseAllWindows()
+                    UiMainWindow.Visible = false
+                    DrawingFade(v , 0 ,0.3)
+    
+                end)
+            end
+            
+            else
+                GuiOpen = true
+                for i,v in pairs(Ui.Rendered) do
+                    pcall(function()
+                        CloseAllWindows()
+                        UiMainWindow.Visible = true
+                        DrawingFade(v , 1 ,0.3)
+    
+                    end)
+                end
+            end
+        end
+    end)
+
+
+    local Ui_Inner = {}
+
+
+    function Ui_Inner:NewTab(Name , oline)
+        Ui.Tabs[Name] = {}
+        local TabContainer = Ui.Tabs[Name]
+        local TabProperties = {LeftTaken = false}
+        local TabButton = DrawUiObject("Square" , { Visible = true ,Filled = true,Thickness = 0, Color = Color3.new(0.12549, 0.121569, 0.129412) , Size = Utilitys.RobloxSize(0, 73, 0, 18) })
+        local TabText = DrawUiObject("Text", {Visible = true,Outline = true, Size = 13, Color = Color3.new(1, 1, 1), Font = Drawing.Fonts.Plex,Center = true , Text = Name})
+        local SelectionBar = DrawUiObject("Square" , { Visible = true,ZIndex = 2 ,Filled = true,Thickness = 0, Color = library.AccentColor , Size = Utilitys.RobloxSize(0, 60, 0, 1) })
+        
+        CreateUiAnchor(SelectionBar ,0.085, 0, 0.99, 0,TabButton) 
+        CreateUiAnchor(TabButton ,TabbarProperties.Index, 0, 0, 0,TabBar) 
+        CreateUiAnchor(TabText ,0.5,0,0.15,0,TabButton) 
+        TabBorder(TabButton,Color3.new(0,0,0))
+
+        TabbarProperties.Index = TabbarProperties.Index + 0.12
+        
+
+        UserInput.InputBegan:Connect(function(KeyPressed , GameProcessed) 
+            if KeyPressed.UserInputType == Enum.UserInputType.MouseButton1 and MouseOver(TabButton) then
+                CloseAllWindows(TabContainer)
+                for _,Drawing in pairs(TabContainer) do
+                    if Drawing then
+
+                        Drawing.Visible = true
+                        DrawingFade(Drawing , 1 , 0.15)
+                    end
+                end
+            end
+        end)    
+
+        Ui.Connected["OutFrame" .. Name] = game:GetService("RunService").RenderStepped:Connect(function()
+            if MouseOver(TabButton) then
+                TabText.Color = library.AccentColor
+            else
+                TabText.Color = Color3.fromRGB(200,200,200)
+            end
+        end)
+
+        TabContainer["SelectionBar" .. Name] = SelectionBar
+        local Tab_Inner = {}
+
+        function Tab_Inner:NewSection(Name)
+            local section_Indexing = 0
+            local Section = DrawUiObject("Square" , { Visible = true ,Filled = true,Thickness = 0, Color = Color3.new(0.12549, 0.121569, 0.129412) , Size = Utilitys.RobloxSize(0, 297, 0, 435) })
+            CreateLegacyBorder(Section,Color3.new(0,0,0))
+            if TabProperties.LeftTaken == false then
+                CreateUiAnchor(Section ,0.0087, 0, 0.06, 0,UiMainWindow)
+                TabProperties.LeftTaken = true
+            else
+                CreateUiAnchor(Section ,0.505, 0, 0.06, 0,UiMainWindow)
+            end
+            TabContainer["Section" .. Name] = Section
+
+            local Interactables = {}
+            function Interactables:Toggle(Properties)
+                
+                section_Indexing = section_Indexing + 0.04
+                local ToggleButton = DrawUiObject("Square" , { Visible = true ,Filled = true,Thickness = 0, Color = Color3.new(0.0901961, 0.0862745, 0.0901961) , Size = Utilitys.RobloxSize(0, 10,0,10) })
+                local ToggleText = DrawUiObject("Text", {Visible = true,Outline = true, Size = 13, Color = Color3.new(1, 1, 1), Font = Drawing.Fonts.Plex,Center = false , Text = Properties["Name"]})
+                local Flag = library.Flags[Properties["Flag"]]
+
+                CreateUiAnchor(ToggleButton , 0.05, 0, section_Indexing, 0, Section)
+                CreateUiAnchor(ToggleText , 3, 0, -0.25, 0, ToggleButton)
+                CreateBorder(ToggleButton,Color3.new(0,0,0))
+
+                Ui.Connected[Properties["Flag"] .. "Toggle"] = UserInput.InputBegan:Connect(function(KeyPressed , GameProcessed) 
+                    if KeyPressed.UserInputType == Enum.UserInputType.MouseButton1 and MouseOver(ToggleButton) and ToggleButton.Visible == true then
+                        if not Flag then
+                            Flag = true
+                            TweenDrawingT:TweenDrawing(ToggleButton,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.In),{Color = library.AccentColor})
+                        else
+                            Flag = false
+                            TweenDrawingT:TweenDrawing(ToggleButton,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.In),{Color = Color3.new(0.0901961, 0.0862745, 0.0901961)})
+                        end
+                    end
+                end)  
+                TabContainer["Toggle" .. Properties["Name"] .. Properties["Flag"]] = ToggleButton
+                TabContainer["ToggleText" .. Properties["Name"] .. Properties["Flag"]] = ToggleText
+
+                local inside = {}
+
+                function inside:Colorpicker(Properties2)
+                    local ColorFunctsioins = {}
+                    local Created = {}
+                    local ColorpickerButton = DrawUiObject("Square" , { Visible = true ,Filled = true,Thickness = 0, Color = Properties2["Default"] , Size = Utilitys.RobloxSize(0, 25, 0, 10) })
+                    TabContainer["ColorPicker" .. Properties["Name"] ..  Properties["Flag"]] = ColorpickerButton
+                    local Flag = library.Flags[Properties["Flag"]]
+                    CreateLegacyBorder(ColorpickerButton,Color3.new(0,0,0))
+
+
+                    local dragginpicker = false
+                    local dragginghue = false
+                    local white, black = Color3.new(1, 1, 1), Color3.new(0, 0, 0)
+                    local colors = {Color3.new(1, 0, 0), Color3.new(1, 1, 0), Color3.new(0, 1, 0), Color3.new(0, 1, 1), Color3.new(0, 0, 1), Color3.new(1, 0, 1), Color3.new(1, 0, 0)}
+                    CreateUiAnchor(ColorpickerButton , 25, 0, 0, 0, ToggleButton)
+                    
+                    
+                    
+                    Ui.Connected[Properties["Name"] .. "ColorPicker"] = UserInput.InputBegan:Connect(function(key)
+                        if MouseOver(ColorpickerButton) and key.UserInputType == Enum.UserInputType.MouseButton1  then
+                            Created["MainBackFrame"] =  DrawUiObject("Square" , {Visible = true ,Filled = true,Thickness = 0, Color = Color3.fromRGB(23,23,23),Size = Utilitys.RobloxSize(0, 204, 0, 173)})
+                            Created["Main"] =  DrawUiObject("Square" , {Visible = true ,Filled = true,Thickness = 0, Color = Properties["Default"],Size = Utilitys.RobloxSize(0, 163, 0, 163)})
+                            Created["Picker"] = DrawUiObject("Image", {Visible = true ,Size = Utilitys.RobloxSize(0, 163, 0, 163), Data = game:HttpGet("https://i.imgur.com/HqG6MM1.png")})
+                            Created["Hue"] = DrawUiObject("Image" , {Visible = true ,Size = Utilitys.RobloxSize(0, 15, 0, 163) , Data = game:HttpGet("https://i.imgur.com/iEOsHFv.png")})
+                            
+                            Created["MainBackFrame"].Position = Utilitys.RobloxPosition(0.576923072, 0, 1, 0, ColorpickerButton)
+                            Created["Main"].Position = Utilitys.RobloxPosition(0.0368654318, 0, 0.0263468847, 0, Created["MainBackFrame"])
+                            Created["Picker"].Position = Utilitys.RobloxPosition( 0.0368654318, 0, 0.0263468847, 0, Created["MainBackFrame"])
+                            Created["Hue"].Position =  Utilitys.RobloxPosition( 0.889704943, 0, 0.0208220221, 0,Created["MainBackFrame"])
+    
+                            Created["MainBackFrame"].Visible = true
+                            Created["Main"].Visible = MainBackFrame.Visible
+                            Created["Picker"].Visible = MainBackFrame.Visible
+                            Created["Hue"].Visible = MainBackFrame.Visible
+    
+                        elseif Created["MainBackFrame"] and MouseOver(Created["MainBackFrame"]) == false then
+                            for i,v in pairs(Created) do
+                                v:Remove() 
+                             end
+                        end
+                    end)
+
+                    Ui.Connected[Properties["Name"] .. "ColorPickerA"] = UserInput.InputBegan:Connect(function(key)
+                        if Created["MainBackFrame"] and  Created["Main"] and MouseOver(Created["Main"]) and key.UserInputType == Enum.UserInputType.MouseButton1 and Created["MainBackFrame"].Visible == true then
+                            dragginpicker = true
+                            Draggable = false
+                        end
+                        if Created["MainBackFrame"] and Created["Hue"] and MouseOver(Created["Hue"]) and key.UserInputType == Enum.UserInputType.MouseButton1 and Created["MainBackFrame"].Visible == true then
+                            dragginghue = true
+                            Draggable = false
+                        end
+                    end)
+                    Ui.Connected[Properties["Name"] .. "ColorPickerB"] = UserInput.InputEnded:Connect(function(key)
+                        if  key.UserInputType == Enum.UserInputType.MouseButton1 then
+                            dragginpicker = false
+                            Draggable = true
+                        end
+                        if key.UserInputType == Enum.UserInputType.MouseButton1 then
+                            dragginghue = false
+                            Draggable = true
+                        end
+                    end)
+
+                    Ui.Connected[Properties["Name"] .. "ColorPickerB"] = game:GetService("RunService").RenderStepped:Connect(function()
+                        if Created["Main"] and MouseOver(Created["Main"]) and dragginpicker then 
+                            local mousepos = UserInput:GetMouseLocation()
+                            local xPercent = (mousepos.X- Created["Picker"].Position.X)/ Created["Picker"].Size.X
+                             -- ^ ^ Getting the pos of cursor in a percent based on the picker's size
+                            local yPercent = (mousepos.Y- Created["Picker"].Position.Y)/ Created["Picker"].Size.Y
+                             -- ^ ^getting pos of cursor in a percent based on picker's size (-36 for roblox hotbar)
+                            local color = white:lerp(Created["Main"].Color, xPercent):lerp(black, yPercent) -- combining all the colors together
+                            ColorpickerButton.Color = color
+                            Flag = ColorpickerButton.Color or color
+                            print(color)
+                        end
+                        if Created["Hue"] and MouseOver(Created["Hue"]) and dragginghue then 
+                            local mousepos = UserInput:GetMouseLocation()
+                        local percent = (mousepos.Y-Created["Hue"].Position.Y)/Created["Hue"].Size.Y
+                         -- ^ ^ getting pos of cursor in a percent based on hue-picker's size (-36 for roblox hotbar)
+                        local num = math.max(1, math.min(7,  --simply for limiting from 1-7 (since 7 colors)
+                            math.floor(((percent*7+0.5)*100))/100 -- *100/1,0 is for more decimal accuracy in the flooring
+                            -- ^ ^ also flooring to the number * 7 + 0.5 since there's 7 colors and the number should be rounded properly
+                            ))
+                        local startC = colors[math.floor(num)] -- the color that's above  your cursor
+                        local endC = colors[math.ceil(num)] -- the color that's below your cursor
+                        Created["Main"].Color = startC:lerp(endC, num-math.floor(num)) or Color3.new(0, 0, 0) -- setting picker background
+                        end
+
+                    end)
+                end 
+                return inside
+            end
+
+            function Interactables:Slider(Properties)
+                section_Indexing = section_Indexing + 0.08
+                local Flag = library.Flags[Properties["Flag"]]
+                local SliderOutFrame = DrawUiObject("Square" , { Visible = true ,Filled = true,Thickness = 0, Color = Color3.new(0.0901961, 0.0862745, 0.0901961) , Size = Utilitys.RobloxSize(0, 185, 0, 11) })
+                local SliderInFrame = DrawUiObject("Square" , { Visible = true ,Filled = true,Thickness = 0, Color = library.AccentColor, Size = Utilitys.RobloxSize(0, 185, 0, 11) })
+                local SliderText = DrawUiObject("Text", {Visible = true,Outline = true, Size = 13, Color = Color3.new(1, 1, 1), Font = Drawing.Fonts.Plex,Center = false , Text = Properties["Name"]})
+                local SliderValue = DrawUiObject("Text", {Visible = true,Outline = true, Size = 13, Color = Color3.new(1, 1, 1), Font = Drawing.Fonts.Plex,Center = true , Text = Properties["Name"] .. "value"})
+
+                TabContainer["SliderOutFrame" .. Properties["Name"]] = SliderOutFrame
+
+                CreateLegacyBorder(SliderOutFrame , Color3.new(0,0,0))
+
+                CreateUiAnchor(SliderOutFrame ,0.155, 0, section_Indexing, 0,  Section)
+                CreateUiAnchor(SliderInFrame ,0, 0, 0, 0,  SliderOutFrame , true)
+                CreateUiAnchor(SliderText ,0, 0, -1.4, 0,  SliderOutFrame, true)
+                CreateUiAnchor(SliderValue ,1, 0, -1.4, 0,  SliderOutFrame, true)
+
+                Ui.Connected["SliderOutFrameStuff" .. Properties["Name"]] = UserInput.InputBegan:Connect(function(input, gameProcessed)
+                    if input.UserInputType == Enum.UserInputType.MouseButton1 and MouseOver(SliderOutFrame) and SliderOutFrame.Visible == true then
+                       SliderDraggng = true
+                       Draggable = false
+                        MouseConnection = mouse.Move:Connect(function()
+                    if SliderDraggng == true then
+                        local msX = (UserInput:GetMouseLocation().X - SliderOutFrame.Position.X)
+
+                        if msX > SliderOutFrame.Size.X then
+                            msX = SliderOutFrame.Size.X
+                        end
+                        
+                        if msX < 0 then
+                            msX = 0
+                        end
+                        local calc = (Properties["Max"] - Properties["Min"]) / SliderOutFrame.Size.X
+                        local result = calc * msX + Properties["Min"]
+                        SliderValue.Text = tostring(math.round(result))
+                        Value = math.round(result)
+                        pcall(
+                            function()
+                                Callback( math.round(result))
+                                Flag =  math.round(result)
+                            end
+                        )
+                        SliderInFrame.Size = Vector2.new(msX, SliderOutFrame.Size.Y)
+                    end
+                end
+            )
+                    end
+                end
+            )
+        
+            Ui.Connected["SliderOutFrame" .. Properties["Name"] .. "SlideDisconnect"] = UserInput.InputEnded:Connect( function(input, gameProcessed)
+                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                        SliderDraggng = false
+                        Draggable = true
+                        MouseConnection:Disconnect()
+                        end
+         end)
+            end
+
+            function Interactables:Dropdown(Properties)
+                section_Indexing = section_Indexing + 0.08
+                local Indexing = 15
+                local locked = sectionXX
+                
+                local Open = false
+                
+                local Flag = library.Flags[Properties["Flag"]]
+                local DropdownMainFrame = DrawUiObject("Square" , { Visible = true ,Filled = true,Thickness = 0, Color = Color3.new(0.0901961, 0.0862745, 0.0901961) , Size = Utilitys.RobloxSize(0, 185, 0, 15) })
+                local DropdownName = DrawUiObject("Text", {Visible = true,Outline = true, Size = 13, Color = Color3.new(1, 1, 1), Font = Drawing.Fonts.Plex,Center = false , Text = Properties["Name"]})
+                local SelectedName = DrawUiObject("Text", {Visible = true,Outline = true, Size = 13, Color = Color3.new(0.4,0.4,0.4), Font = Drawing.Fonts.Plex,Center = false , Text = "None"})
+                local Idickator = DrawUiObject("Text", {Visible = true,Outline = true, Size = 13, Color = Color3.new(0.4,0.4,0.4), Font = Drawing.Fonts.Plex,Center = false , Text = "+"})
+                
+                local Open = false
+                local Index = 0
+
+               Ui.Connected[Properties["Name"] .. Properties["Flag"]] = UserInput.InputBegan:Connect(function(input, gameProcessed)
+                 if input.UserInputType == Enum.UserInputType.MouseButton1 and MouseOver(DropdownMainFrame) and Section.Visible == true and Open == false then
+                    Open = true
+                    print("Ran")
+                        
+                    local DropdownBelowFrame = Utilitys.instance.new("Frame")
+                    local Connect0 = CreateUiAnchor(DropdownBelowFrame, 0, 0, 1, 0, DropdownMainFrame , true)
+                    DropdownBelowFrame.Size = Utilitys.RobloxSize(0, 185, 0, 0, Section )
+                    DropdownBelowFrame.Color = Color3.new(0.2,0.2,0.2)
+                    Created["Main__Frame"] = DropdownBelowFrame
+                    for i,v in pairs(Properties["Options"]) do
+                        print("loop")
+                        local FrameButton = Utilitys.instance.new("TextButton")
+                        Created[Indexing .. "Frame"] = FrameButton["TextFrame"]
+                        Created[Indexing .. "Frame2"] = FrameButton["Background"]
+                        FrameButton["TextFrame"].Text = v
+                        FrameButton["TextFrame"].Font = Drawing.Fonts.Plex
+                        FrameButton["TextFrame"].Size = 13
+                        FrameButton["Background"].Size = Utilitys.RobloxSize(0, 185, 0, 15, Section)
+                        FrameButton["Background"].Color = Color3.fromRGB(39,39,39)
+                        CreateUiAnchor(FrameButton["Background"], 0, 0, 0, Indexing, DropdownMainFrame, true)
+                        CreateUiAnchor(FrameButton["TextFrame"], 0.01, 0, 0.05, 0, FrameButton["Background"], true)
+                        DropdownBelowFrame.Size = Utilitys.RobloxSize(0, 185, 0, Indexing, Section)
+                        
+                        Ui.Connected[Properties["Name"] .. Properties["Flag"]] = UserInput.InputBegan:Connect(function(input, gameProcessed)
+                            if input.UserInputType == Enum.UserInputType.MouseButton1 and MouseOver(FrameButton["Background"]) and DropdownBelowFrame.Visible == true then
+                                print(v , "was selected")
+                                SelectedName.Text = v
+                                Indexing = 15
+                                Flag = tostring(v)
+                                for i,v in pairs(Created) do
+                                   v:Remove() 
+                                end
+                                Open = false
+                            end
+                        end)
+
+                        Indexing = Indexing + 15
+                        print("donered!")
+                    end
+                    print("Ran2")
+                 end
+               end)
+                                CreateUiAnchor(DropdownName ,0, 0, -1, 0,  DropdownMainFrame, true)
+                CreateUiAnchor(SelectedName ,0.05, 0, 0.1, 0,  DropdownMainFrame, true)
+                CreateUiAnchor(Idickator ,0.95, 0, 0.1, 0,  DropdownMainFrame, true)
+                CreateUiAnchor(DropdownMainFrame ,0.155, 0, section_Indexing, 0,  Section)
+                TabContainer["DropdownMainFrame" .. Properties["Name"]] = DropdownMainFrame
+            end
+
+            return Interactables    
+        end
+        return Tab_Inner
+    end
+    return Ui_Inner
+ end
+ return library
